@@ -1,0 +1,2 @@
+class CachedFileNotFound(Exception):
+    pass

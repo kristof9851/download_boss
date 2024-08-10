@@ -1,0 +1,2 @@
+class RetriesExhausted(Exception):
+    pass

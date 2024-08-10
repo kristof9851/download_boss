@@ -1,0 +1,2 @@
+class CachedFileExpired(Exception):
+    pass

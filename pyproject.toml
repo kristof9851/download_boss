@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools >= 61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "download_boss"
+version = "0.0.1"
+description = "Python download library"
+authors = [ { name="kristof9851" } ]
+readme = "README.md"
+license = {file = "LICENSE.md"}
+classifiers=[
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.10",
+    "License :: OSI Approved :: MIT License"
+]
+requires-python = ">=3.10"
+
+[project.urls]
+Homepage = "https://github.com/kristof9851/download_boss"
+Issues = "https://github.com/kristof9851/download_boss/issues"
