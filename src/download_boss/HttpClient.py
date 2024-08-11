@@ -1,4 +1,5 @@
 import requests
+import logging
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from .AbstractClient import AbstractClient
@@ -27,6 +28,8 @@ class HttpClient(AbstractClient):
                    https://requests.readthedocs.io/en/latest/api/#requests.HTTPError
     """
     def download(self, request):
+        logging.info(f'Requesting: {request.method} {request.url}')
+
         response = self.session.send(request.prepare())
         response.raise_for_status()
         return response

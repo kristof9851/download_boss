@@ -2,6 +2,8 @@ import os
 import time
 import hashlib
 import requests
+import logging
+import traceback
 
 from .AbstractWrapper import AbstractWrapper
 from .error.CachedFileNotFound import CachedFileNotFound
@@ -26,7 +28,10 @@ class FileCacheWrapper(AbstractWrapper):
     def download(self, request):
         try:
             return self._getCache(request)
-        except:
+        except Exception as e:
+            if not isinstance(e, CachedFileNotFound) and not isinstance(e, CachedFileExpired):
+                traceback.print_exc()
+            
             response = self.client.download(request)
             self._setCache(request, response)
             return response
@@ -42,17 +47,20 @@ class FileCacheWrapper(AbstractWrapper):
         cacheKey = self._getCacheKey(request)
         
         if not os.path.isfile(cacheKey):
+            logging.info(f'Cache miss: {request.method} {request.url}')
             raise CachedFileNotFound(cacheKey)
         
         currentTime = time.time()
         fileTime = os.path.getctime(cacheKey)
 
-        if fileTime > currentTime - self.cacheLength:
+        if self.cacheLength is not None and fileTime > currentTime - self.cacheLength:
+            logging.info(f'Cache expired: {request.method} {request.url}')
             raise CachedFileExpired(cacheKey)
         
         with open(cacheKey) as f:
+            logging.info(f'Cache found: {request.method} {request.url}')
             response = requests.Response()
-            response.text = f.read()
+            response._content = f.read().encode('utf-8')
             return response
 
     def _getCacheKey(self, request):

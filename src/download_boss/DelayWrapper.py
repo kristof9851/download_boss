@@ -1,5 +1,6 @@
 import time
 import random
+import logging
 
 from .AbstractWrapper import AbstractWrapper
 
@@ -20,7 +21,10 @@ class DelayWrapper(AbstractWrapper):
         self.maxLength = maxLength
 
     def download(self, request):
-        time.sleep(self._generateDelayLength())
+        delay = self._generateDelayLength()
+        logging.info(f'Delaying by {delay}s ... {request.method} {request.url}')
+        
+        time.sleep(delay)
         return self.client.download(request)
 
     def _generateDelayLength(self):

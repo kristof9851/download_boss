@@ -1,4 +1,5 @@
 import time
+import logging
 
 from .AbstractWrapper import AbstractWrapper
 from .error.RetriesExhausted import RetriesExhausted
@@ -29,6 +30,8 @@ class RetryWrapper(AbstractWrapper):
                 return response
             except:
                 if retriesLeft > 0:
+                    logging.info(f'Retrying... {request.method} {request.url}')
+                    
                     retriesLeft = retriesLeft - 1
                     time.sleep(1)
                 else:

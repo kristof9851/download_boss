@@ -1,8 +1,8 @@
 import logging
 import os
 
-class LogHandler:
-    LEVEL = os.environ.get('LOGLEVEL', 'DEBUG').upper()
+class Logs:
+    LEVEL = os.environ.get('LOGLEVEL', 'INFO').upper()
     FORMAT = '%(asctime)s [%(levelname)5s] %(filename)s :: %(funcName)s() - %(message)s'
 
     def createSchedulerLogger(self, processConfig, configLogs):
