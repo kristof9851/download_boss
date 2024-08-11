@@ -13,6 +13,7 @@ pip install download_boss
 
 ## 2. Usage
 
+### 2.1. HttpClient with Wrappers
 ```python
 import requests
 import os
@@ -51,7 +52,7 @@ for id in jsonIds:
 # The second time this is run, it will run instantly because FileCacheWrapper's cacheLength is not set (=None) so it caches responses indefinitely
 ```
 
-### Output from first run
+**Output from first run**
 
 ```bash
 (venv) C:\apps\download_boss>python demo\demo1.py
@@ -71,7 +72,7 @@ for id in jsonIds:
 2024-08-11 13:09:08,999 [ INFO] FileCacheWrapper.py :: _getCache() - Cache found: GET https://httpbin.org/anything/222
 ```
 
-### Output from second run
+**Output from second run**
 
 ```bash
 (venv) C:\apps\download_boss>python demo\demo1.py
@@ -81,6 +82,30 @@ for id in jsonIds:
 2024-08-11 13:09:10,907 [ INFO] FileCacheWrapper.py :: _getCache() - Cache found: POST https://httpbin.org/anything/two
 2024-08-11 13:09:10,909 [ INFO] FileCacheWrapper.py :: _getCache() - Cache found: GET https://httpbin.org/anything/111
 2024-08-11 13:09:10,909 [ INFO] FileCacheWrapper.py :: _getCache() - Cache found: GET https://httpbin.org/anything/222
+```
+
+### 2.2. HttpClient with Kerberos auth
+
+```python
+import requests
+import os
+from requests_kerberos import HTTPKerberosAuth, OPTIONAL
+
+from download_boss.HttpClient import HttpClient
+from download_boss.RetryWrapper import RetryWrapper
+from download_boss.DelayWrapper import DelayWrapper
+from download_boss.FileCacheWrapper import FileCacheWrapper
+
+# Cache responses in folder
+cacheFolder = os.path.join( os.path.dirname(__file__), "tmp" )
+
+# Create HTTP client with wrappers
+client = FileCacheWrapper( DelayWrapper( RetryWrapper( HttpClient() ), length=0 ), cacheFolderPath=cacheFolder )
+
+# Create request with Kerberos auth
+newUrl = 'https://httpbin.org/anything/kerb'
+request = requests.Request(method='POST', url=newUrl, auth=HTTPKerberosAuth(mutual_authentication=OPTIONAL))
+client.download(request)
 ```
 
 ## 3. Maintainer documentation
