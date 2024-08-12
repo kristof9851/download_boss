@@ -1,6 +1,8 @@
 ## TODO
 
 - DelayWrapper should not use fixed delays, but calculate the time between now and the last request, and just make sure the calculated delay has taken place in between the two requests
+- RetryWrapper: able to parameterize status code ranges where Error should be thrown. Maybe it shouldn't even throw an error, just return whatever was returned
+- HTTPClient: it's send method should accept kwargs to be able to tell it to not verify ssl certs
 
 * Add more Clients to support:
   * file

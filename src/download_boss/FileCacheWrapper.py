@@ -83,6 +83,7 @@ class FileCacheWrapper(AbstractWrapper):
         url = url.replace('/', '_')
         url = url.replace(':', '_')
         url = url.replace('?', '_')
+        url = url.replace('=', '_')
         return url
     
     def removeCache(self, request):

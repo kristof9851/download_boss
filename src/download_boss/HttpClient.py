@@ -8,8 +8,9 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class HttpClient(AbstractClient):
 
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.session = requests.Session()
+        # self.kwargs = kwargs
 
     """
     Sends a HTTP request to download a resource based on request parameter.
@@ -31,5 +32,6 @@ class HttpClient(AbstractClient):
         logging.info(f'Requesting: {request.method} {request.url}')
 
         response = self.session.send(request.prepare())
+        # response = self.session.send(request.prepare(), **self.kwargs)
         response.raise_for_status()
         return response
