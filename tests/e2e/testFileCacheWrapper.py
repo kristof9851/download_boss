@@ -3,6 +3,7 @@ import requests
 import time
 import os
 
+from download_boss.RequestEnvelope import RequestEnvelope
 from download_boss.HttpClient import HttpClient
 from download_boss.FileCacheWrapper import FileCacheWrapper
 from .util.TestUtil import getCacheDirPath
@@ -11,7 +12,7 @@ class TestFileCacheWrapper(unittest.TestCase):
 
     def testNoCachedFile(self):
         wrapper = FileCacheWrapper(HttpClient(), cacheFolderPath=getCacheDirPath())
-        request = requests.Request(method='get', url=f'https://httpbin.org/uuid')
+        request = RequestEnvelope(requests.Request(method='get', url=f'https://httpbin.org/uuid'))
 
         wrapper.removeCache(request)
         cacheKey = wrapper._getCacheKey(request)
@@ -21,7 +22,7 @@ class TestFileCacheWrapper(unittest.TestCase):
 
     def testCachedFileExpired(self):
         wrapper = FileCacheWrapper(HttpClient(), cacheFolderPath=getCacheDirPath(), cacheLength=0)
-        request = requests.Request(method='get', url=f'https://httpbin.org/uuid')
+        request = RequestEnvelope(requests.Request(method='get', url=f'https://httpbin.org/uuid'))
 
         response1 = wrapper.download(request)
         time.sleep(1)

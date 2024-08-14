@@ -8,6 +8,6 @@ class AbstractWrapper(AbstractClient):
     # 
     # Invoke the client.download() in your method, and return its response
     #
-    # def download(self, request):
-    #     return self.client.download(request)
+    # def download(self, requestEnvelope):
+    #     return self.client.download(requestEnvelope)
     # 

@@ -2,6 +2,7 @@ import unittest
 import requests
 import time
 
+from download_boss.RequestEnvelope import RequestEnvelope
 from download_boss.HttpClient import HttpClient
 from download_boss.DelayWrapper import DelayWrapper
 
@@ -9,10 +10,10 @@ class TestDelayWrapper(unittest.TestCase):
 
     def testNoDelay(self):
         wrapper = DelayWrapper(HttpClient())
-        request = requests.Request(method='get', url='https://httpbin.org/status/200')
+        r = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/200'))
 
         startTime = time.time()
-        response = wrapper.download(request)
+        response = wrapper.download(r)
         endTime = time.time()
 
         self.assertEqual(response.status_code, 200)
@@ -20,10 +21,10 @@ class TestDelayWrapper(unittest.TestCase):
 
     def testDelay(self):
         wrapper = DelayWrapper(HttpClient(), length=3)
-        request = requests.Request(method='get', url='https://httpbin.org/status/200')
+        r = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/200'))
 
         startTime = time.time()
-        response = wrapper.download(request)
+        response = wrapper.download(r)
         endTime = time.time()
 
         self.assertEqual(response.status_code, 200)

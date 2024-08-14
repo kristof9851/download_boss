@@ -8,5 +8,5 @@ logging.basicConfig(level=Logs.LEVEL, format=Logs.FORMAT)
 class AbstractClient(ABC):
 
     @abstractmethod
-    def download(self, request):
+    def download(self, requestEnvelope):
         pass

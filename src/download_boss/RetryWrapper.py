@@ -10,6 +10,14 @@ class RetryWrapper(AbstractWrapper):
     Parameters:
         client (AbstractClient): Ie. HttpClient
         count (int):             Max retry count
+    """
+    def __init__(self, client, count=3):
+        super().__init__(client)
+        self.count = count
+
+    """
+    Parameters:
+        requestEnvelope (RequestEnvelope): The request
         
     Returns: 
         (Response): https://requests.readthedocs.io/en/latest/api/#requests.Response
@@ -17,20 +25,16 @@ class RetryWrapper(AbstractWrapper):
     Throws:
         RetriesExhausted : If all retries have been exhausted of a failed request
     """
-    def __init__(self, client, count=3):
-        super().__init__(client)
-        self.count = count
-
-    def download(self, request):
+    def download(self, requestEnvelope):
         retriesLeft = self.count
 
         while True:
             try:
-                response = self.client.download(request)
+                response = self.client.download(requestEnvelope)
                 return response
             except:
                 if retriesLeft > 0:
-                    logging.info(f'Retrying... {request.method} {request.url}')
+                    logging.info(f'Retrying... {requestEnvelope}')
                     
                     retriesLeft = retriesLeft - 1
                     time.sleep(1)
