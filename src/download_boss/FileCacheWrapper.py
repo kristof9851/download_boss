@@ -1,4 +1,5 @@
 import os
+import re
 import time
 import hashlib
 import requests
@@ -58,7 +59,7 @@ class FileCacheWrapper(AbstractWrapper):
             raise CachedFileExpired(cacheKey)
         
         with open(cacheKey) as f:
-            logging.info(f'Cache found: {request.method} {request.url}')
+            logging.debug(f'Cache found: {request.method} {request.url}')
             response = requests.Response()
             response._content = f.read().encode('utf-8')
             return response
@@ -78,13 +79,8 @@ class FileCacheWrapper(AbstractWrapper):
         return os.path.join(self.cacheFolderPath, fileName)
     
     def _urlToFileName(self, url):
-        url = url.replace('http://', '')
-        url = url.replace('https://', '')
-        url = url.replace('/', '_')
-        url = url.replace(':', '_')
-        url = url.replace('?', '_')
-        url = url.replace('=', '_')
-        return url
+        # https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file
+        return re.sub(r'[<>:"/\\|?*]', '_', url)
     
     def removeCache(self, request):
         cacheKey = self._getCacheKey(request)
