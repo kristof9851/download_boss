@@ -28,6 +28,15 @@ class TestFileCacheWrapper(unittest.TestCase):
         time.sleep(1)
         response2 = wrapper.download(request)
         self.assertNotEqual(response1.text, response2.text)
+        
+    def testCachedFileReused(self):
+        wrapper = FileCacheWrapper(HttpClient(), cacheFolderPath=getCacheDirPath())
+        request = RequestEnvelope(requests.Request(method='get', url=f'https://httpbin.org/uuid'))
+
+        response1 = wrapper.download(request)
+        time.sleep(1)
+        response2 = wrapper.download(request)
+        self.assertEqual(response1.text, response2.text)
 
 if __name__ == '__main__':
     unittest.main()
