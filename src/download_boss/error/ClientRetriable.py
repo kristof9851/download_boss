@@ -1,0 +1,2 @@
+class ClientRetriable(Exception):
+    pass

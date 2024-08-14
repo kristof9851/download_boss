@@ -19,8 +19,9 @@ class TestHttpClient(unittest.TestCase):
     def testFailure(self):
         client = HttpClient()
         request = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/500'))
+        response = client.download(request)
 
-        self.assertRaises(HTTPError, client.download, request)
+        self.assertEqual(response.status_code, 500)
 
     def testHeaders(self):
         client = HttpClient()

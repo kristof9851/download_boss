@@ -3,6 +3,7 @@ import logging
 
 from .AbstractWrapper import AbstractWrapper
 from .error.RetriesExhausted import RetriesExhausted
+from .error.ClientRetriable import ClientRetriable
 
 class RetryWrapper(AbstractWrapper):
 
@@ -32,11 +33,11 @@ class RetryWrapper(AbstractWrapper):
             try:
                 response = self.client.download(requestEnvelope)
                 return response
-            except:
+            except ClientRetriable:
                 if retriesLeft > 0:
                     logging.info(f'Retrying... {requestEnvelope}')
                     
                     retriesLeft = retriesLeft - 1
                     time.sleep(1)
                 else:
-                    raise RetriesExhausted()
+                    raise RetriesExhausted(requestEnvelope)

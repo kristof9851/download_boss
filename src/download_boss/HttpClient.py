@@ -3,12 +3,18 @@ import logging
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from .AbstractClient import AbstractClient
+from .error.ClientRetriable import ClientRetriable
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class HttpClient(AbstractClient):
 
-    def __init__(self):
+    """
+    Parameters:
+        clientRetriableStatusCodeRanges (list) : List of int-s and/or range()-s when the client should throw a retriable exception
+    """
+    def __init__(self, clientRetriableStatusCodeRanges=None):
+        self.clientRetriableStatusCodeRanges = clientRetriableStatusCodeRanges or []
         self.session = requests.Session()
 
     """
@@ -22,14 +28,17 @@ class HttpClient(AbstractClient):
 
     Returns: 
         (Response): https://requests.readthedocs.io/en/latest/api/#requests.Response
-        
+
     Throws:
-        HTTPError: If the request failed with 4xx or 5xx status
-                   https://requests.readthedocs.io/en/latest/api/#requests.HTTPError
+        ClientRetriable: If the request should be retried
     """
     def download(self, requestEnvelope):
         logging.info(f'Requesting: {requestEnvelope}')
 
         response = self.session.send(requestEnvelope.request.prepare(), **requestEnvelope.kwargs)
-        response.raise_for_status()
+
+        for statusCodes in self.clientRetriableStatusCodeRanges:
+            if (isinstance(statusCodes, int) and statusCodes == response.status_code) or (isinstance(statusCodes, range) and response.status_code in statusCodes):
+                raise ClientRetriable(requestEnvelope)
+
         return response
