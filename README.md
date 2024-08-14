@@ -25,7 +25,7 @@ from download_boss.DelayWrapper import DelayWrapper
 from download_boss.FileCacheWrapper import FileCacheWrapper
 
 # Cache responses in folder
-cacheFolder = os.path.join( os.path.dirname(__file__), "tmp" )
+cacheFolder = os.path.join( os.path.dirname(__file__), "cache" )
 
 # Create HTTP client with wrappers
 client = FileCacheWrapper( DelayWrapper( RetryWrapper( HttpClient() ), length=0 ), cacheFolderPath=cacheFolder )
@@ -97,7 +97,7 @@ from download_boss.DelayWrapper import DelayWrapper
 from download_boss.FileCacheWrapper import FileCacheWrapper
 
 # Cache responses in folder
-cacheFolder = os.path.join( os.path.dirname(__file__), "tmp" )
+cacheFolder = os.path.join( os.path.dirname(__file__), "cache" )
 
 # Create HTTP client with wrappers
 client = FileCacheWrapper( DelayWrapper( RetryWrapper( HttpClient() ), length=0 ), cacheFolderPath=cacheFolder )

@@ -1,7 +1,7 @@
 import os
 
-def getTmpDirPath():
+def getCacheDirPath():
     utilDir = os.path.dirname(__file__)
     e2eDir = os.path.dirname(utilDir)
-    tmpDir = os.path.join(e2eDir, "tmp")
-    return tmpDir
+    cacheDir = os.path.join(e2eDir, "cache")
+    return cacheDir
