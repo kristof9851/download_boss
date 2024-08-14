@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.0.3
+
+- Added request envelop to further customize the download action
+- Change cache file naming pattern
+- Made HTTPClient download retries fully customizable 
+
 ## 0.0.2
 
 - Added a demo file

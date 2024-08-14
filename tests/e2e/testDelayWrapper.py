@@ -10,10 +10,10 @@ class TestDelayWrapper(unittest.TestCase):
 
     def testNoDelay(self):
         wrapper = DelayWrapper(HttpClient())
-        r = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/200'))
+        rrequest = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/200'))
 
         startTime = time.time()
-        response = wrapper.download(r)
+        response = wrapper.download(request)
         endTime = time.time()
 
         self.assertEqual(response.status_code, 200)
@@ -21,10 +21,10 @@ class TestDelayWrapper(unittest.TestCase):
 
     def testDelay(self):
         wrapper = DelayWrapper(HttpClient(), length=3)
-        r = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/200'))
+        request = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/200'))
 
         startTime = time.time()
-        response = wrapper.download(r)
+        response = wrapper.download(request)
         endTime = time.time()
 
         self.assertEqual(response.status_code, 200)
