@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.4
+
+- Added Basic and Aws auth generators
+- Added Opensearch API
+
 ## 0.0.3
 
 - Added request envelop to further customize the download action

@@ -4,7 +4,6 @@
   * file
   * aws
   * ssh
-  * git
 
 * Add more wrappers
   * ExtractWrapper  // zip, tar, tgz
