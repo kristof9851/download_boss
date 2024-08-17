@@ -7,6 +7,7 @@ from ..HttpClient import HttpClient
 from ..RetryWrapper import RetryWrapper
 from ..RequestEnvelope import RequestEnvelope
 from ..error.AuthFailed import AuthFailed
+from .AbstractAuthGenerator import AbstractAuthGenerator
 
 class AwsAuthGenerator(AbstractAuthGenerator):
 
