@@ -74,6 +74,7 @@ class FileCacheWrapper(AbstractWrapper):
         r['url'] = requestEnvelope.request.url
         r['headers'] = requestEnvelope.request.headers
         r['data'] = requestEnvelope.request.data
+        r['json'] = requestEnvelope.request.json
         r['params'] = requestEnvelope.request.params
 
         hash = hashlib.md5(str(r).encode()).hexdigest()
