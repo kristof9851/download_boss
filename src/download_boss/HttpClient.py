@@ -39,6 +39,6 @@ class HttpClient(AbstractClient):
 
         for statusCodes in self.clientRetriableStatusCodeRanges:
             if (isinstance(statusCodes, int) and statusCodes == response.status_code) or (isinstance(statusCodes, range) and response.status_code in statusCodes):
-                raise ClientRetriable(requestEnvelope)
+                raise ClientRetriable(response)
 
         return response

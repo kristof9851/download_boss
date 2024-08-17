@@ -19,13 +19,17 @@ class TestRetryWrapper(unittest.TestCase):
         wrapper = RetryWrapper(HttpClient(clientRetriableStatusCodeRanges=[500]))
         request = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/500'))
 
-        self.assertRaises(RetriesExhausted, wrapper.download, request)
+        with self.assertRaises(RetriesExhausted) as e:
+            wrapper.download(request)
+        self.assertEqual(500, e.exception.message.status_code)
 
     def testRetriableRange(self):
         wrapper = RetryWrapper(HttpClient(clientRetriableStatusCodeRanges=[range(500, 600)]))
-        request = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/500'))
+        request = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/504'))
 
-        self.assertRaises(RetriesExhausted, wrapper.download, request)
+        with self.assertRaises(RetriesExhausted) as e:
+            wrapper.download(request)
+        self.assertEqual(504, e.exception.message.status_code)
 
     def testNonRetriable(self):
         wrapper = RetryWrapper(HttpClient())

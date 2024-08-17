@@ -1,2 +1,4 @@
 class CachedFileExpired(Exception):
-    pass
+    def __init__(self, message):
+        super(CachedFileExpired, self).__init__(message)
+        self.message = message

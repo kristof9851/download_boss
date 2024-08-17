@@ -31,13 +31,12 @@ class RetryWrapper(AbstractWrapper):
 
         while True:
             try:
-                response = self.client.download(requestEnvelope)
-                return response
-            except ClientRetriable:
+                return self.client.download(requestEnvelope)
+            except ClientRetriable as e:
                 if retriesLeft > 0:
                     logging.info(f'Retrying... {requestEnvelope}')
                     
                     retriesLeft = retriesLeft - 1
                     time.sleep(1)
                 else:
-                    raise RetriesExhausted(requestEnvelope)
+                    raise RetriesExhausted(e.message)

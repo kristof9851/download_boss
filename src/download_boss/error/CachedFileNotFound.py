@@ -1,2 +1,4 @@
 class CachedFileNotFound(Exception):
-    pass
+    def __init__(self, message):
+        super(CachedFileNotFound, self).__init__(message)
+        self.message = message
