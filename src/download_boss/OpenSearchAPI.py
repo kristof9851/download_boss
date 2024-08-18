@@ -54,14 +54,13 @@ class OpenSearchAPI:
                 if not isRetriable:
                     raise e
 
-    def _getMatchQuery(matchFields, returnFields=None, returnSource=False, size=1000):
+    def _getMatchQuery(matchFields, returnFields=None, size=1000):
         query = {
             'query': {
                 'bool': {
                     'must': [ {'match': {key: value}} for key, value in matchFields.items() ]
                 }
             },
-            '_source': returnSource,
             'size': size
         }
 
