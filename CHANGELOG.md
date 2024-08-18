@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.0.5
+
+- Some bugfixes
+- Rename clientRetriable params
+
 ## 0.0.4
 
 - Added Basic and Aws auth generators
