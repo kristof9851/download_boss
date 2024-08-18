@@ -40,9 +40,9 @@ class TestOpenSearchAPI(unittest.TestCase):
     def testSearchMatchRetriable(self):
         os = OpenSearchAPI(
             'https://httpbin.org/anything', 
-            HttpClient(clientRetriableStatusCodeRanges=[200]), 
+            HttpClient(throwRetriableStatusCodeRanges=[200]), 
             BasicAuthGenerator("user", "pass"),
-            authRetriableStatusCodeRanges=[200]
+            catchRetriableStatusCodeRanges=[200]
         )
 
         with self.assertRaises(RetriesExhausted) as e:
@@ -51,9 +51,9 @@ class TestOpenSearchAPI(unittest.TestCase):
     def testSearchMatchNonRetriable(self):
         os = OpenSearchAPI(
             'https://httpbin.org/non-existent', 
-            HttpClient(clientRetriableStatusCodeRanges=[404]), 
+            HttpClient(throwRetriableStatusCodeRanges=[404]), 
             BasicAuthGenerator("user", "pass"),
-            authRetriableStatusCodeRanges=[403]
+            catchRetriableStatusCodeRanges=[403]
         )
 
         with self.assertRaises(ClientRetriable) as e:

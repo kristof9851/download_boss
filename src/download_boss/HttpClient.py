@@ -11,10 +11,10 @@ class HttpClient(AbstractClient):
 
     """
     Parameters:
-        clientRetriableStatusCodeRanges (list) : List of int-s and/or range()-s when the client should throw a retriable exception
+        throwRetriableStatusCodeRanges (list) : List of int-s and/or range()-s when the client should throw a retriable exception
     """
-    def __init__(self, clientRetriableStatusCodeRanges=None):
-        self.clientRetriableStatusCodeRanges = clientRetriableStatusCodeRanges or []
+    def __init__(self, throwRetriableStatusCodeRanges=None):
+        self.throwRetriableStatusCodeRanges = throwRetriableStatusCodeRanges or []
         self.session = requests.Session()
 
     """
@@ -37,7 +37,7 @@ class HttpClient(AbstractClient):
 
         response = self.session.send(requestEnvelope.request.prepare(), **requestEnvelope.kwargs)
 
-        for statusCodes in self.clientRetriableStatusCodeRanges:
+        for statusCodes in self.throwRetriableStatusCodeRanges:
             if (isinstance(statusCodes, int) and statusCodes == response.status_code) or (isinstance(statusCodes, range) and response.status_code in statusCodes):
                 raise ClientRetriable(response)
 

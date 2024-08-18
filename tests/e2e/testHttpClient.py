@@ -25,7 +25,7 @@ class TestHttpClient(unittest.TestCase):
         self.assertEqual(response.status_code, 500)
 
     def testRetriableStatusCodes(self):
-        client = HttpClient(clientRetriableStatusCodeRanges=[401, range(500,600)])
+        client = HttpClient(throwRetriableStatusCodeRanges=[401, range(500,600)])
 
         request = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/401'))
         with self.assertRaises(ClientRetriable) as e:

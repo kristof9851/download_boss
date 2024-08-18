@@ -23,7 +23,7 @@ class AwsAuthGenerator(AbstractAuthGenerator):
         self.aws4auth = None
 
     def _createClient(self):
-        httpClient = HttpClient(clientRetriableStatusCodeRanges=[range(500,600)])
+        httpClient = HttpClient(throwRetriableStatusCodeRanges=[range(500,600)])
         httpClient = RetryWrapper(httpClient)
         return httpClient
 
@@ -85,8 +85,8 @@ class AwsAuthGenerator(AbstractAuthGenerator):
             auth=HTTPKerberosAuth(mutual_authentication=OPTIONAL)
         )
         response = self.client.download(RequestEnvelope(request, verify=False))
-        if response.status_code != 200 or self.authCookieName not in response.cookie:
+        if response.status_code != 200 or self.authCookieName not in response.cookies:
             logging.error(f"Failed to get Auth cookie. Status {response.status_code}. Response: {response.text}")
             raise AuthFailed(response)
 
-        return response.cookie[self.authCookieName]
+        return response.cookies[self.authCookieName]
