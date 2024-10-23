@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.6
+
+- Fix CacheWrapper filectime -> filemtime
+
 ## 0.0.5
 
 - Some bugfixes

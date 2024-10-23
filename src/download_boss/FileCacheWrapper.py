@@ -56,7 +56,7 @@ class FileCacheWrapper(AbstractWrapper):
             raise CachedFileNotFound(cacheKey)
         
         currentTime = time.time()
-        fileTime = os.path.getctime(cacheKey)
+        fileTime = os.path.getmtime(cacheKey)
 
         if self.cacheLength is not None and fileTime + self.cacheLength < currentTime:
             logging.info(f'Cache expired: {requestEnvelope}')

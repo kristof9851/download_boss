@@ -2,6 +2,8 @@
 
 ## 1. Clone project and install pip/python
 
+
+
 ## 2. Create virtual env and install project dependencies
 
 Install `virtualenv` to set up your virtual environment
@@ -34,6 +36,8 @@ Install module locally, so you can import it as a module
 pip install -e .
 ```
 
+
+
 ## 3. Run the tests
 
 ### Prerequisites
@@ -49,7 +53,15 @@ Steps 1. and 2. above
 ./tests.sh
 ```
 
-## 4. Build and upload release
+
+
+## 4. Release
+
+### 4.A. Commit and release automatically
+
+Git add, commit and push to GitHub. The GitHub action will automatically publish the new version to PyPi.
+
+### 4.B. Build and upload release manually
 
 Install dependencies
 
