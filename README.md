@@ -5,7 +5,7 @@
 
 *Python download library*
 
-
+&nbsp;
 
 ## 1. Installation
 
@@ -13,7 +13,7 @@
 pip install download_boss
 ```
 
-
+&nbsp;
 
 ## 2. Usage
 
@@ -89,6 +89,8 @@ for id in jsonIds:
 2024-08-11 13:09:10,909 [ INFO] FileCacheWrapper.py :: _getCache() - Cache found: GET https://httpbin.org/anything/222
 ```
 
+&nbsp;
+
 ### 2.2. HttpClient with Kerberos auth
 
 ```python
@@ -111,6 +113,8 @@ newUrl = 'https://httpbin.org/anything/kerb'
 request = RequestEnvelope(requests.Request(method='POST', url=newUrl, auth=HTTPKerberosAuth(mutual_authentication=OPTIONAL)))
 client.download(request)
 ```
+
+&nbsp;
 
 ## 3. Contribute
 
@@ -146,6 +150,7 @@ Install module locally as editable
 pip install -e .
 ```
 
+&nbsp;
 
 ### 3.2. Testing
 
@@ -157,10 +162,13 @@ pip install -e .
 ./tests.sh
 ```
 
+&nbsp;
 
 ### 3.3. Release (automated)
 
 Git add/commit/push to GitHub. The GitHub action will automatically publish the new version to PyPi.
+
+&nbsp;
 
 ### 3.4. Release (manual)
 
