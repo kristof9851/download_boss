@@ -5,8 +5,6 @@
 
 *Python download library*
 
-&nbsp;
-
 ## 1. Installation
 
 ```bash
@@ -17,101 +15,158 @@ pip install download_boss
 
 ## 2. Usage
 
-### 2.1. HttpClient with Wrappers
+### 2.1 HttpClient
+Simple request
 ```python
-import requests
-import os
-import json
+from requests import Request
+from download_boss.RequestEnvelope import RequestEnvelope
+from download_boss.HttpClient import HttpClient
 
+request = RequestEnvelope(
+    Request(method='POST', url='https://httpbin.org/anything/hello', json={"hello": "world"},
+    {'verify': False, 'timeout': 10})
+)
+response = HttpClient().download(request)
+print(response.text)
+
+```
+
+Retry based on HTTP status codes
+```python
+from requests import Request
+from download_boss.RequestEnvelope import RequestEnvelope
+from download_boss.HttpClient import HttpClient
+from download_boss.error.ClientRetriable import ClientRetriable
+
+request = RequestEnvelope(
+    Request(method='GET', url='https://httpbin.org/anything/hello')
+)
+client = HttpClient(throwRetriableStatusCodeRanges=[401, range(500,599)])
+
+while True:
+    try:
+        response = client.download(request)
+        print(response.text)
+        break
+    except ClientRetriable:
+        continue
+
+```
+
+Kerberos authentication:
+```python
+from requests import Request
+from requests_kerberos import HTTPKerberosAuth, OPTIONAL
+from download_boss.RequestEnvelope import RequestEnvelope
+from download_boss.HttpClient import HttpClient
+
+request = RequestEnvelope(
+    Request(method='POST', url='https://httpbin.org/anything/kerb', auth=HTTPKerberosAuth(mutual_authentication=OPTIONAL))
+)
+response = HttpClient().download(request)
+```
+
+### 2.2. RetryWrapper
+
+Retry automatically some HTTP status codes
+```python
+from requests import Request
+from download_boss.RequestEnvelope import RequestEnvelope
+from download_boss.HttpClient import HttpClient
+from download_boss.RetryWrapper import RetryWrapper
+from download_boss.error.RetriesExhausted import RetriesExhausted
+
+request = RequestEnvelope(
+    Request(method='GET', url='https://httpbin.org/status/500')
+)
+client = HttpClient(throwRetriableStatusCodeRanges=[401, range(500,599)])
+client = RetryWrapper(client, count=1, catchRetriableStatusCodeRanges=[range(500,599)])
+
+try:
+    response = client.download(request)
+except RetriesExhausted:
+    print("Retries exhausted!")
+
+"""
+2024-12-03 11:51:10,085 [ INFO] HttpClient.py :: download() - Requesting: GET https://httpbin.org/status/500
+2024-12-03 11:51:10,485 [ INFO] RetryWrapper.py :: download() - Retrying... GET https://httpbin.org/status/500
+2024-12-03 11:52:10,485 [ INFO] HttpClient.py :: download() - Requesting: GET https://httpbin.org/status/500
+Retries exhausted!
+"""
+```
+
+### 2.3. DelayWrapper
+
+Delay download calls by 2-5 seconds
+
+```python
+from requests import Request
+from download_boss.RequestEnvelope import RequestEnvelope
+from download_boss.HttpClient import HttpClient
+from download_boss.RetryWrapper import RetryWrapper
+from download_boss.DelayWrapper import DelayWrapper
+from download_boss.error.RetriesExhausted import RetriesExhausted
+
+client = HttpClient(throwRetriableStatusCodeRanges=[401, range(500,599)])
+client = RetryWrapper(client, count=1, catchRetriableStatusCodeRanges=[range(500,599)]) 
+client = DelayWrapper(client, length=2, maxLength=5) 
+
+requests = [
+    RequestEnvelope( Request(method='GET', url='https://httpbin.org/anything/one') ),
+    RequestEnvelope( Request(method='GET', url='https://httpbin.org/anything/two') ),
+    RequestEnvelope( Request(method='GET', url='https://httpbin.org/anything/three') )
+]
+
+for r in requests:
+    response = client.download(r)
+
+"""
+2024-12-03 12:00:28,804 [ INFO] DelayWrapper.py :: download() - Delaying by 3s ... GET https://httpbin.org/anything/one
+2024-12-03 12:00:31,805 [ INFO] HttpClient.py :: download() - Requesting: GET https://httpbin.org/anything/one
+2024-12-03 12:00:32,206 [ INFO] DelayWrapper.py :: download() - Delaying by 2s ... GET https://httpbin.org/anything/two
+2024-12-03 12:00:34,208 [ INFO] HttpClient.py :: download() - Requesting: GET https://httpbin.org/anything/two
+2024-12-03 12:00:34,827 [ INFO] DelayWrapper.py :: download() - Delaying by 5s ... GET https://httpbin.org/anything/three
+2024-12-03 12:00:39,830 [ INFO] HttpClient.py :: download() - Requesting: GET https://httpbin.org/anything/three
+"""
+
+```
+
+### 2.4. FileCacheWrapper
+```python
+from os.path import join, dirname
+from requests import Request
 from download_boss.RequestEnvelope import RequestEnvelope
 from download_boss.HttpClient import HttpClient
 from download_boss.RetryWrapper import RetryWrapper
 from download_boss.DelayWrapper import DelayWrapper
 from download_boss.FileCacheWrapper import FileCacheWrapper
 
-# Cache responses in folder
-cacheFolder = os.path.join( os.path.dirname(__file__), "cache" )
+cacheFolderPath = join(dirname(__file__), "cache")
+cacheLength = 60*60*24 # 1 day
 
-# Create HTTP client with wrappers
-client = FileCacheWrapper( DelayWrapper( RetryWrapper( HttpClient(clientRetriableStatusCodeRanges=[range(500,600)]) ), length=0 ), cacheFolderPath=cacheFolder )
+client = HttpClient(throwRetriableStatusCodeRanges=[401, range(500,599)]) 
+client = RetryWrapper(client, count=1, catchRetriableStatusCodeRanges=[range(500,599)]) 
+client = DelayWrapper(client, length=2, maxLength=5)
+client = FileCacheWrapper(client, cacheFolderPath, cacheLength)
 
-# Download two responses
-jsonBaseUrl = 'https://httpbin.org/anything/'
-jsonIds = ['one', 'two']
+requests = [
+    RequestEnvelope( Request(method='GET', url='https://httpbin.org/anything/one') ),
+    RequestEnvelope( Request(method='GET', url='https://httpbin.org/anything/one') ),
+    RequestEnvelope( Request(method='GET', url='https://httpbin.org/anything/one') )
+]
 
-for id in jsonIds:
-    # Send data with the request, so we can use read it from the response
-    request = RequestEnvelope(requests.Request(method='POST', url=jsonBaseUrl + id, json=[{"subId": "111"}, {"subId": "222"}]))
-    response = client.download(request)
-    
-    # Use the response to construct sub-requests
-    jsonText = json.loads(response.text)
-    for o in jsonText['json']:
-        sid = o['subId']
+for r in requests:
+    response = client.download(r)
 
-        # Download and cache subrequests
-        newUrl = 'https://httpbin.org/anything/' + sid
-        request = RequestEnvelope(requests.Request(method='GET', url=newUrl), )
-        client.download(request)
-
-# The second time this is run, it will run instantly because FileCacheWrapper's cacheLength is not set (=None) so it caches responses indefinitely
-```
-
-**Output from first run**
-
-```bash
-(venv) C:\apps\download_boss>python demo\demo1.py
-2024-08-11 13:09:08,284 [ INFO] FileCacheWrapper.py :: _getCache() - Cache miss: POST https://httpbin.org/anything/one
-2024-08-11 13:09:08,284 [ INFO] DelayWrapper.py :: download() - Delaying by 0s ... POST https://httpbin.org/anything/one
-2024-08-11 13:09:08,284 [ INFO] HttpClient.py :: download() - Requesting: POST https://httpbin.org/anything/one
-2024-08-11 13:09:08,688 [ INFO] FileCacheWrapper.py :: _getCache() - Cache miss: GET https://httpbin.org/anything/111
-2024-08-11 13:09:08,688 [ INFO] DelayWrapper.py :: download() - Delaying by 0s ... GET https://httpbin.org/anything/111
-2024-08-11 13:09:08,690 [ INFO] HttpClient.py :: download() - Requesting: GET https://httpbin.org/anything/111
-2024-08-11 13:09:08,794 [ INFO] FileCacheWrapper.py :: _getCache() - Cache miss: GET https://httpbin.org/anything/222
-2024-08-11 13:09:08,794 [ INFO] DelayWrapper.py :: download() - Delaying by 0s ... GET https://httpbin.org/anything/222
-2024-08-11 13:09:08,794 [ INFO] HttpClient.py :: download() - Requesting: GET https://httpbin.org/anything/222
-2024-08-11 13:09:08,894 [ INFO] FileCacheWrapper.py :: _getCache() - Cache miss: POST https://httpbin.org/anything/two
-2024-08-11 13:09:08,895 [ INFO] DelayWrapper.py :: download() - Delaying by 0s ... POST https://httpbin.org/anything/two
-2024-08-11 13:09:08,895 [ INFO] HttpClient.py :: download() - Requesting: POST https://httpbin.org/anything/two
-2024-08-11 13:09:08,996 [ INFO] FileCacheWrapper.py :: _getCache() - Cache found: GET https://httpbin.org/anything/111
-2024-08-11 13:09:08,999 [ INFO] FileCacheWrapper.py :: _getCache() - Cache found: GET https://httpbin.org/anything/222
-```
-
-**Output from second run**
-
-```bash
-(venv) C:\apps\download_boss>python demo\demo1.py
-2024-08-11 13:09:10,905 [ INFO] FileCacheWrapper.py :: _getCache() - Cache found: POST https://httpbin.org/anything/one
-2024-08-11 13:09:10,907 [ INFO] FileCacheWrapper.py :: _getCache() - Cache found: GET https://httpbin.org/anything/111
-2024-08-11 13:09:10,907 [ INFO] FileCacheWrapper.py :: _getCache() - Cache found: GET https://httpbin.org/anything/222
-2024-08-11 13:09:10,907 [ INFO] FileCacheWrapper.py :: _getCache() - Cache found: POST https://httpbin.org/anything/two
-2024-08-11 13:09:10,909 [ INFO] FileCacheWrapper.py :: _getCache() - Cache found: GET https://httpbin.org/anything/111
-2024-08-11 13:09:10,909 [ INFO] FileCacheWrapper.py :: _getCache() - Cache found: GET https://httpbin.org/anything/222
-```
-
-&nbsp;
-
-### 2.2. HttpClient with Kerberos auth
-
-```python
-import requests
-import os
-from requests_kerberos import HTTPKerberosAuth, OPTIONAL
-
-from download_boss.RequestEnvelope import RequestEnvelope
-from download_boss.HttpClient import HttpClient
-from download_boss.FileCacheWrapper import FileCacheWrapper
-
-# Cache responses in folder
-cacheFolder = os.path.join( os.path.dirname(__file__), "cache" )
-
-# Create HTTP client with wrappers
-client = FileCacheWrapper( HttpClient(), cacheFolderPath=cacheFolder )
-
-# Create request with Kerberos auth
-newUrl = 'https://httpbin.org/anything/kerb'
-request = RequestEnvelope(requests.Request(method='POST', url=newUrl, auth=HTTPKerberosAuth(mutual_authentication=OPTIONAL)))
-client.download(request)
+"""
+2024-12-03 13:26:24,921 [ INFO] FileCacheWrapper.py :: _getCache() - Cache miss: GET https://httpbin.org/anything/one
+2024-12-03 13:26:24,921 [ INFO] DelayWrapper.py :: download() - Delaying by 3s ... GET https://httpbin.org/anything/one
+2024-12-03 13:26:27,923 [ INFO] HttpClient.py :: download() - Requesting: GET https://httpbin.org/anything/one
+2024-12-03 13:26:27,956 [DEBUG] connectionpool.py :: _new_conn() - Starting new HTTPS connection (1): httpbin.org:443
+2024-12-03 13:26:29,256 [DEBUG] connectionpool.py :: _make_request() - https://httpbin.org:443 "GET /anything/one HTTP/11" 200 370
+2024-12-03 13:26:29,257 [DEBUG] FileCacheWrapper.py :: _getCache() - Cache found: GET https://httpbin.org/anything/one
+2024-12-03 13:26:29,263 [DEBUG] FileCacheWrapper.py :: _getCache() - Cache found: GET https://httpbin.org/anything/one
+"""
 ```
 
 &nbsp;
@@ -137,6 +192,7 @@ python -m venv venv
 .\venv\Scripts\activate
 
 # Activate your virtual environment (Linux)
+chmod +x venv/bin/activate
 source venv/bin/activate
 ```
 
