@@ -5,11 +5,15 @@
 
 *Python download library*
 
+
+
 ## 1. Installation
 
 ```bash
 pip install download_boss
 ```
+
+
 
 ## 2. Usage
 
@@ -108,5 +112,70 @@ request = RequestEnvelope(requests.Request(method='POST', url=newUrl, auth=HTTPK
 client.download(request)
 ```
 
-## 3. Maintainer documentation
-See: [docs/README_MAINTAINER.md](docs/README_MAINTAINER.md)
+## 3. Contribute
+
+### 3.1. Install locally
+
+Install pip/python.
+
+Clone the project.
+
+Create virtual env:
+```bash
+# Install virtualenv module
+pip install --upgrade virtualenv
+cd <PROJECT_ROOT>
+
+# Create venv in your project
+python -m venv venv
+
+# Activate your virtual environment (Windows)
+.\venv\Scripts\activate
+
+# Activate your virtual environment (Linux)
+source venv/bin/activate
+```
+
+Install project dependencies:
+```bash
+pip install -r requirements.txt
+```
+
+Install module locally as editable
+```bash
+pip install -e .
+```
+
+
+### 3.2. Testing
+
+```bash
+# Run test suite (Windows)
+.\wtests.bat
+
+# Run test suite (Linux)
+./tests.sh
+```
+
+
+### 3.3. Release (automated)
+
+Git add/commit/push to GitHub. The GitHub action will automatically publish the new version to PyPi.
+
+### 3.4. Release (manual)
+
+Install dependencies
+
+```bash
+pip install --upgrade setuptools wheel build twine
+```
+
+Build the package (wheel and sdist)
+```bash
+python -m build 
+```
+
+Ensure `.pypirc` in user folder is correct, then upload
+```bash
+python -m twine upload dist/*
+```
