@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.0.7
+
+- RequestEnvelope renamed to HttpRequestEnvelope, added AbstractRequestEnvelope to formalize it. getCacheKey is now part of it, instead of FileCacheWrapper
+- Added Boto3LogsRequestEnvelope
+- Added logic to FileCacheWrapper to load/save different *RequestEnvelope-s based on the class
+- Moved `requests.packages.urllib3.disable_warnings()` to the test files, instead of the source files
+- AwsAuthGenerator now only returns raw AWS credentials. Added RequestsAwsAuthGenerator that extends AwsAuthGenerator and returns AWS4Auth object with credentials
+- Added Boto3LogsClient for querying CloudWatch logs with Boto3 package
+
 ## 0.0.6
 
 - Fix CacheWrapper filectime -> filemtime

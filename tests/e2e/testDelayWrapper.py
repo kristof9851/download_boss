@@ -2,15 +2,17 @@ import unittest
 import requests
 import time
 
-from download_boss.RequestEnvelope import RequestEnvelope
+from download_boss.HttpRequestEnvelope import HttpRequestEnvelope
 from download_boss.HttpClient import HttpClient
 from download_boss.DelayWrapper import DelayWrapper
+
+requests.packages.urllib3.disable_warnings()
 
 class TestDelayWrapper(unittest.TestCase):
 
     def testNoDelay(self):
         wrapper = DelayWrapper(HttpClient())
-        request = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/200'))
+        request = HttpRequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/200'))
 
         startTime = time.time()
         response = wrapper.download(request)
@@ -21,7 +23,7 @@ class TestDelayWrapper(unittest.TestCase):
 
     def testDelay(self):
         wrapper = DelayWrapper(HttpClient(), length=3)
-        request = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/200'))
+        request = HttpRequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/200'))
 
         startTime = time.time()
         response = wrapper.download(request)

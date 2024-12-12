@@ -9,6 +9,8 @@ from download_boss.HttpClient import HttpClient
 from download_boss.OpenSearchAPI import OpenSearchAPI
 from download_boss.auth.BasicAuthGenerator import BasicAuthGenerator
 
+requests.packages.urllib3.disable_warnings()
+
 class TestOpenSearchAPI(unittest.TestCase):
 
     def testSearchMatchSuccess(self):

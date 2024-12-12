@@ -5,7 +5,7 @@ from requests_aws4auth import AWS4Auth
 
 from ..HttpClient import HttpClient
 from ..RetryWrapper import RetryWrapper
-from ..RequestEnvelope import RequestEnvelope
+from ..HttpRequestEnvelope import HttpRequestEnvelope
 from ..error.AuthFailed import AuthFailed
 from .AbstractAuthGenerator import AbstractAuthGenerator
 
@@ -20,7 +20,7 @@ class AwsAuthGenerator(AbstractAuthGenerator):
         self.awsService = awsService
         self.client = client or self._createClient()
 
-        self.aws4auth = None
+        self.credentials = None
 
     def _createClient(self):
         httpClient = HttpClient(throwRetriableStatusCodeRanges=[range(500,600)])
@@ -28,38 +28,19 @@ class AwsAuthGenerator(AbstractAuthGenerator):
         return httpClient
 
     """
-    Return AWS4Auth with current credentials
+    Return current credentials
     """
     def get(self):
-        if self.aws4auth is None:
-            self.aws4auth = self._auth()
+        if self.credentials is None:
+            self.credentials = self._requestAuthCredentials()
 
-        return self.aws4auth
+        return self.credentials
 
     """
-    Regenerate credentials for AWS4Auth, and store it
+    Regenerate credentials and store it
     """
     def refresh(self):
-        self.aws4auth = self._auth()
-
-    """
-    Create AWS4Auth with fresh credentials
-
-    Throws:
-        AuthFailed: If any of the auth calls fail
-    """
-    def _auth(self):
-        logging.info("Getting AWS credentials...")
-
-        credentials = self._requestAuthCredentials()
-
-        return AWS4Auth(
-            credentials['accessKeyId'],
-            credentials['secretAccessKey'],
-            self.awsRegion,
-            self.awsService,
-            session_token=credentials['sessionToken']
-        )
+        self.credentials = self._requestAuthCredentials()
 
     def _requestAuthCredentials(self):
         request = requests.Request(
@@ -71,7 +52,7 @@ class AwsAuthGenerator(AbstractAuthGenerator):
                 "Cookie": self.authCookieName + "=" + self._requestAuthCookie()
             }
         )
-        response = self.client.download(RequestEnvelope(request, verify=False))
+        response = self.client.download(HttpRequestEnvelope(request, verify=False))
         if response.status_code != 200 or 'credentials' not in response.json():
             logging.error(f"Failed to get AWS credentials. Status {response.status_code}. Response: {response.text}")
             raise AuthFailed(response)
@@ -84,7 +65,7 @@ class AwsAuthGenerator(AbstractAuthGenerator):
             url=self.authCookieBaseUrl,
             auth=HTTPKerberosAuth(mutual_authentication=OPTIONAL)
         )
-        response = self.client.download(RequestEnvelope(request, verify=False))
+        response = self.client.download(HttpRequestEnvelope(request, verify=False))
         if response.status_code != 200 or self.authCookieName not in response.cookies:
             logging.error(f"Failed to get Auth cookie. Status {response.status_code}. Response: {response.text}")
             raise AuthFailed(response)

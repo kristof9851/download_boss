@@ -1,10 +1,11 @@
 import logging
 import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import time
 
 from download_boss.error.RetriesExhausted import RetriesExhausted
 from download_boss.error.ClientRetriable import ClientRetriable
-from download_boss.RequestEnvelope import RequestEnvelope
+from download_boss.HttpRequestEnvelope import HttpRequestEnvelope
 
 class OpenSearchAPI:
     
@@ -19,7 +20,7 @@ class OpenSearchAPI:
         return self.search(OpenSearchAPI._getMatchQuery(matchDict))
 
     def search(self, query):
-        requestEnvelope = RequestEnvelope(
+        httpRequestEnvelope = HttpRequestEnvelope(
             requests.Request(
                 method = 'GET',
                 url = self.baseUrl + '/_search',
@@ -33,7 +34,7 @@ class OpenSearchAPI:
         retriesLeft = self.retryCount
         while True:
             try:
-                return self.client.download(requestEnvelope)
+                return self.client.download(httpRequestEnvelope)
             except ClientRetriable as e:
                 isRetriable = False
 
@@ -41,7 +42,7 @@ class OpenSearchAPI:
                     if (isinstance(statusCodes, int) and statusCodes == e.message.status_code) or (isinstance(statusCodes, range) and e.message.status_code in statusCodes):
                         
                         if retriesLeft > 0:
-                            logging.info(f'Retrying... {requestEnvelope}')
+                            logging.info(f'Retrying... {httpRequestEnvelope}')
                             isRetriable = True
 
                             retriesLeft = retriesLeft - 1

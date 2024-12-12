@@ -4,14 +4,16 @@ from requests import HTTPError
 from requests.exceptions import SSLError
 
 from download_boss.HttpClient import HttpClient
-from download_boss.RequestEnvelope import RequestEnvelope
+from download_boss.HttpRequestEnvelope import HttpRequestEnvelope
 from download_boss.error.ClientRetriable import ClientRetriable
+
+requests.packages.urllib3.disable_warnings()
 
 class TestHttpClient(unittest.TestCase):
 
     def testRequestSuccess(self):
         client = HttpClient()
-        request = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/get?id=testGet'))
+        request = HttpRequestEnvelope(requests.Request(method='get', url='https://httpbin.org/get?id=testGet'))
         response = client.download(request)
 
         self.assertEqual(response.status_code, 200)
@@ -19,7 +21,7 @@ class TestHttpClient(unittest.TestCase):
 
     def testRequestFailure(self):
         client = HttpClient()
-        request = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/500'))
+        request = HttpRequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/500'))
         response = client.download(request)
 
         self.assertEqual(response.status_code, 500)
@@ -27,23 +29,23 @@ class TestHttpClient(unittest.TestCase):
     def testRetriableStatusCodes(self):
         client = HttpClient(throwRetriableStatusCodeRanges=[401, range(500,600)])
 
-        request = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/401'))
+        request = HttpRequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/401'))
         with self.assertRaises(ClientRetriable) as e:
             client.download(request)
         self.assertEqual(401, e.exception.message.status_code)
         
-        request = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/504'))
+        request = HttpRequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/504'))
         with self.assertRaises(ClientRetriable) as e:
             client.download(request)
         self.assertEqual(504, e.exception.message.status_code)
 
-        request = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/200'))
+        request = HttpRequestEnvelope(requests.Request(method='get', url='https://httpbin.org/status/200'))
         response = client.download(request)
         self.assertEqual(response.status_code, 200)
 
     def testRequestWithHeaders(self):
         client = HttpClient()
-        request = RequestEnvelope(requests.Request(method='get', url='https://httpbin.org/get?id=testHeaders', headers={'Test-Header': '1234567890'}))
+        request = HttpRequestEnvelope(requests.Request(method='get', url='https://httpbin.org/get?id=testHeaders', headers={'Test-Header': '1234567890'}))
         response = client.download(request)
 
         self.assertEqual(response.status_code, 200)
@@ -53,10 +55,10 @@ class TestHttpClient(unittest.TestCase):
     def testRequestWithKwargs(self):
         client = HttpClient()
 
-        request = RequestEnvelope(requests.Request(method='get', url='https://self-signed.badssl.com/'), verify=True)
+        request = HttpRequestEnvelope(requests.Request(method='get', url='https://self-signed.badssl.com/'), verify=True)
         self.assertRaises(SSLError, client.download, request)
 
-        request = RequestEnvelope(requests.Request(method='get', url='https://self-signed.badssl.com/'), verify=False)
+        request = HttpRequestEnvelope(requests.Request(method='get', url='https://self-signed.badssl.com/'), verify=False)
         response = client.download(request)
         self.assertEqual(response.status_code, 200)
 

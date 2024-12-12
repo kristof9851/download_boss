@@ -3,26 +3,28 @@ import requests
 import time
 import os
 
-from download_boss.RequestEnvelope import RequestEnvelope
+from download_boss.HttpRequestEnvelope import HttpRequestEnvelope
 from download_boss.HttpClient import HttpClient
 from download_boss.FileCacheWrapper import FileCacheWrapper
 from .util.TestUtil import getCacheDirPath
+
+requests.packages.urllib3.disable_warnings()
 
 class TestFileCacheWrapper(unittest.TestCase):
 
     def testNoCachedFile(self):
         wrapper = FileCacheWrapper(HttpClient(), cacheFolderPath=getCacheDirPath())
-        request = RequestEnvelope(requests.Request(method='get', url=f'https://httpbin.org/uuid'))
+        request = HttpRequestEnvelope(requests.Request(method='get', url=f'https://httpbin.org/uuid'))
 
         wrapper.removeCache(request)
-        cacheKey = wrapper._getCacheKey(request)
-        self.assertFalse( os.path.isfile(cacheKey) )
+        cacheKeyPath = os.path.join(getCacheDirPath(), request.getCacheKey())
+        self.assertFalse( os.path.isfile(cacheKeyPath) )
         wrapper.download(request)
-        self.assertTrue( os.path.isfile(cacheKey) )
+        self.assertTrue( os.path.isfile(cacheKeyPath) )
 
     def testCachedFileExpired(self):
         wrapper = FileCacheWrapper(HttpClient(), cacheFolderPath=getCacheDirPath(), cacheLength=0)
-        request = RequestEnvelope(requests.Request(method='get', url=f'https://httpbin.org/uuid'))
+        request = HttpRequestEnvelope(requests.Request(method='get', url=f'https://httpbin.org/uuid'))
 
         response1 = wrapper.download(request)
         time.sleep(1)
@@ -31,7 +33,7 @@ class TestFileCacheWrapper(unittest.TestCase):
         
     def testCachedFileReused(self):
         wrapper = FileCacheWrapper(HttpClient(), cacheFolderPath=getCacheDirPath())
-        request = RequestEnvelope(requests.Request(method='get', url=f'https://httpbin.org/uuid'))
+        request = HttpRequestEnvelope(requests.Request(method='get', url=f'https://httpbin.org/uuid'))
 
         response1 = wrapper.download(request)
         time.sleep(1)

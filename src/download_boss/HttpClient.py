@@ -1,11 +1,8 @@
 import requests
 import logging
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from .AbstractClient import AbstractClient
 from .error.ClientRetriable import ClientRetriable
-
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class HttpClient(AbstractClient):
 

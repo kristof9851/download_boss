@@ -9,6 +9,7 @@ import traceback
 from .AbstractWrapper import AbstractWrapper
 from .error.CachedFileNotFound import CachedFileNotFound
 from .error.CachedFileExpired import CachedFileExpired
+from .Boto3LogsRequestEnvelope import Boto3LogsRequestEnvelope
 
 class FileCacheWrapper(AbstractWrapper):
 
@@ -42,53 +43,46 @@ class FileCacheWrapper(AbstractWrapper):
             return response
 
     def _setCache(self, requestEnvelope, response):
-        cacheKey = self._getCacheKey(requestEnvelope)
-        cacheValue = response.text
+        cacheKey = requestEnvelope.getCacheKey()
+        cacheKeyPath = os.path.join(self.cacheFolderPath, cacheKey)
 
-        with open(cacheKey, 'w') as f:
+        if isinstance(requestEnvelope, Boto3LogsRequestEnvelope):
+            cacheValue = json.dumps(response)
+        else:
+            cacheValue = response.text
+
+        with open(cacheKeyPath, 'w') as f:
             f.write(cacheValue)
 
     def _getCache(self, requestEnvelope):
-        cacheKey = self._getCacheKey(requestEnvelope)
+        cacheKey = requestEnvelope.getCacheKey()
+        cacheKeyPath = os.path.join(self.cacheFolderPath, cacheKey)
         
-        if not os.path.isfile(cacheKey):
+        if not os.path.isfile(cacheKeyPath):
             logging.info(f'Cache miss: {requestEnvelope}')
-            raise CachedFileNotFound(cacheKey)
+            raise CachedFileNotFound(cacheKeyPath)
         
         currentTime = time.time()
-        fileTime = os.path.getmtime(cacheKey)
+        fileTime = os.path.getmtime(cacheKeyPath)
 
         if self.cacheLength is not None and fileTime + self.cacheLength < currentTime:
             logging.info(f'Cache expired: {requestEnvelope}')
-            raise CachedFileExpired(cacheKey)
+            raise CachedFileExpired(cacheKeyPath)
         
-        with open(cacheKey) as f:
+        with open(cacheKeyPath) as f:
             logging.debug(f'Cache found: {requestEnvelope}')
-            response = requests.Response()
-            response._content = f.read().encode('utf-8')
+
+            if isinstance(requestEnvelope, Boto3LogsRequestEnvelope):
+                response = json.load(f)
+            else:
+                response = requests.Response()
+                response._content = f.read().encode('utf-8')
+            
             return response
 
-    def _getCacheKey(self, requestEnvelope):
-        r = {}
-        r['method'] = requestEnvelope.request.method
-        r['url'] = requestEnvelope.request.url
-        r['headers'] = requestEnvelope.request.headers
-        r['data'] = requestEnvelope.request.data
-        r['json'] = requestEnvelope.request.json
-        r['params'] = requestEnvelope.request.params
-
-        hash = hashlib.md5(str(r).encode()).hexdigest()
-
-        fileName = self._urlToFileName(requestEnvelope.request.url) + '_' + hash + '.txt'
-
-        return os.path.join(self.cacheFolderPath, fileName)
-    
-    def _urlToFileName(self, url):
-        # https://learn.microsoft.com/en-us/windows/win32/fileio/naming-a-file
-        return re.sub(r'[<>:"/\\|?*]', '_', url)
-    
     def removeCache(self, requestEnvelope):
-        cacheKey = self._getCacheKey(requestEnvelope)
+        cacheKey = requestEnvelope.getCacheKey()
+        cacheKeyPath = os.path.join(self.cacheFolderPath, cacheKey)
         
-        if os.path.isfile(cacheKey):
-            os.remove(cacheKey)
+        if os.path.isfile(cacheKeyPath):
+            os.remove(cacheKeyPath)
