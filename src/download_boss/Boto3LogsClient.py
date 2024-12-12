@@ -26,7 +26,7 @@ class Boto3LogsClient(AbstractClient):
         )
 
     def download(self, boto3LogsRequestEnvelope):
-        logging.info(f'Requesting: {requestEnvelope}')
+        logging.info(f'Requesting: {boto3LogsRequestEnvelope}')
 
         response = self.client.start_query(**boto3LogsRequestEnvelope.kwargs)
 
