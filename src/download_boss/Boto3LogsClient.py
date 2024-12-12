@@ -10,7 +10,7 @@ class Boto3LogsClient(AbstractClient):
         self.awsAuthGenerator = awsAuthGenerator
         self.region = region
         self.sleepSecondsBetweenQueryChecks = sleepSecondsBetweenQueryChecks
-        self.client = MNone
+        self.client = None
 
         self._refreshClient()
 
