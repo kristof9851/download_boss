@@ -5,6 +5,7 @@ import hashlib
 import requests
 import logging
 import traceback
+import json
 
 from .AbstractWrapper import AbstractWrapper
 from .error.CachedFileNotFound import CachedFileNotFound
