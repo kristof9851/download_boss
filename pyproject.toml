@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "download_boss"
-version = "0.0.7"
+version = "0.0.8"
 description = "Python download library"
 authors = [ { name="kristof9851" } ]
 readme = "README.md"

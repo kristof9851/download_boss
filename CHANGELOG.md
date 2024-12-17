@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.8
+
+- Boto3LogsClient can now throw ClientRetriable error if AWS credentials expired
+
 ## 0.0.7
 
 - RequestEnvelope renamed to HttpRequestEnvelope, added AbstractRequestEnvelope to formalize it. getCacheKey is now part of it, instead of FileCacheWrapper
