@@ -2,6 +2,8 @@
 ![Python CI Build](https://github.com/kristof9851/download_boss/actions/workflows/python-ci.yml/badge.svg)
 ![PyPI Downloads](https://img.shields.io/pypi/dm/download_boss?label=PyPI%20Downloads&color=rgb(50%2C%20165%2C%20233)
 )
+![PyPI Version](https://img.shields.io/pypi/v/download_boss)
+
 
 *Python download library*
 
