@@ -1,6 +1,7 @@
 import os
 import re
 import hashlib
+import json
 
 from .AbstractRequestEnvelope import AbstractRequestEnvelope
 
@@ -16,7 +17,18 @@ class HttpRequestEnvelope(AbstractRequestEnvelope):
         self.kwargs = kwargs
 
     def __repr__(self):
-        return f'{self.request.method} {self.request.url}'
+        s = ''
+        s += f'{self.request.method} '
+        s += f'{self.request.url} '
+        s += f'DATA={json.dumps(self.request.data)} '
+        s += f'JSON={json.dumps(self.request.json)} '
+        s += f'PARAMS={json.dumps(self.request.params)} '
+        s += f'HEADERS={json.dumps(self.request.headers)}'
+
+        if len(s) > 300:
+            s = s[:300] + '...'
+
+        return s
 
     def getCacheKey(self):
         r = {}

@@ -192,7 +192,7 @@ python -m venv venv
 
 # Activate your virtual environment (Windows)
 .\venv\Scripts\activate
-
++
 # Activate your virtual environment (Linux)
 chmod +x venv/bin/activate
 source venv/bin/activate

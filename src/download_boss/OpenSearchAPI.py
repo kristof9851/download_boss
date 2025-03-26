@@ -2,6 +2,8 @@ import logging
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 import time
+import json
+from types import SimpleNamespace
 
 from download_boss.error.RetriesExhausted import RetriesExhausted
 from download_boss.error.ClientRetriable import ClientRetriable
@@ -16,10 +18,64 @@ class OpenSearchAPI:
         self.catchRetriableStatusCodeRanges = catchRetriableStatusCodeRanges or [401, 403]
         self.retryCount = retryCount
 
-    def searchMatch(self, matchDict):
-        return self.search(OpenSearchAPI._getMatchQuery(matchDict))
+    def searchMatch(self, matchDict, getAllResults=False):
+        return self.search(
+            OpenSearchAPI._getMatchQuery(matchDict),
+            getAllResults
+        )
 
-    def search(self, query):
+    def _getMatchQuery(matchFields, returnFields=None, searchFrom=0, searchSize=1000):
+        query = {
+            'query': {
+                'bool': {
+                    'must': [ {'match': {key: value}} for key, value in matchFields.items() ]
+                }
+            },
+            'from': searchFrom,
+            'size': searchSize
+        }
+
+        if isinstance(returnFields, dict):
+            query['fields'] = returnFields
+
+        return query
+
+    def search(self, query, getAllResults):
+        if getAllResults:
+            searchFrom = query.get('from', 0)
+            searchSize = query.get('size', 1000)
+
+            allResults = {
+                'hits': {
+                    'total': {'value': 0},
+                    'hits': []
+                }
+            }
+            while True:
+                query['from'] = searchFrom
+                query['size'] = searchSize
+
+                response = self._searchWithRetries(query)
+                if response.status_code != 200:
+                    return response
+
+                responseJson = response.json()
+                hits = responseJson['hits']['hits']
+
+                allResults['hits']['hits'].extend(hits)
+                allResults['hits']['total']['value'] += len(hits)
+
+                if len(hits) < searchSize:
+                    r = SimpleNamespace()
+                    r.status_code = 200
+                    r.text = json.dumps(allResults)
+                    return r
+
+                searchFrom += searchSize
+        else:
+            return self._searchWithRetries(query)
+
+    def _searchWithRetries(self, query):
         httpRequestEnvelope = HttpRequestEnvelope(
             requests.Request(
                 method = 'GET',
@@ -54,18 +110,3 @@ class OpenSearchAPI:
 
                 if not isRetriable:
                     raise e
-
-    def _getMatchQuery(matchFields, returnFields=None, size=1000):
-        query = {
-            'query': {
-                'bool': {
-                    'must': [ {'match': {key: value}} for key, value in matchFields.items() ]
-                }
-            },
-            'size': size
-        }
-
-        if isinstance(returnFields, dict):
-            query['fields'] = returnFields
-
-        return query

@@ -28,6 +28,7 @@ class TestOpenSearchAPI(unittest.TestCase):
         self.assertEqual(json['headers']['Authorization'], "Basic dXNlcjpwYXNz")
         self.assertEqual(json['headers']['Content-Type'], "application/json")
         self.assertEqual(json['json'], {
+            "from": 0,
             "query": {
                 "bool": {
                     "must": [{

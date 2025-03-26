@@ -71,7 +71,7 @@ class FileCacheWrapper(AbstractWrapper):
             raise CachedFileExpired(cacheKeyPath)
         
         with open(cacheKeyPath) as f:
-            logging.debug(f'Cache found: {requestEnvelope}')
+            logging.info(f'Cache found: {requestEnvelope}')
 
             if isinstance(requestEnvelope, Boto3LogsRequestEnvelope):
                 response = json.load(f)
