@@ -5,11 +5,13 @@ from requests.exceptions import SSLError
 
 from download_boss.error.RetriesExhausted import RetriesExhausted
 from download_boss.error.ClientRetriable import ClientRetriable
-from download_boss.HttpClient import HttpClient
-from download_boss.OpenSearchAPI import OpenSearchAPI
-from download_boss.auth.BasicAuthGenerator import BasicAuthGenerator
+from download_boss.client.HttpClient import HttpClient
+from download_boss.api.OpenSearchAPI import OpenSearchAPI
+from download_boss.auth_generator.BasicAuthGenerator import BasicAuthGenerator
+
 
 requests.packages.urllib3.disable_warnings()
+
 
 class TestOpenSearchAPI(unittest.TestCase):
 

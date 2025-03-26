@@ -1,6 +1,7 @@
 import hashlib
 
-from .AbstractRequestEnvelope import AbstractRequestEnvelope
+from download_boss.client.request.AbstractRequestEnvelope import AbstractRequestEnvelope
+
 
 class Boto3LogsRequestEnvelope(AbstractRequestEnvelope):
 

@@ -21,8 +21,8 @@ pip install download_boss
 Simple request
 ```python
 from requests import Request
-from download_boss.RequestEnvelope import RequestEnvelope
-from download_boss.HttpClient import HttpClient
+from download_boss.client.request.RequestEnvelope import RequestEnvelope
+from download_boss.client.HttpClient import HttpClient
 
 request = RequestEnvelope(
     Request(method='POST', url='https://httpbin.org/anything/hello', json={"hello": "world"},
@@ -36,8 +36,8 @@ print(response.text)
 Retry based on HTTP status codes
 ```python
 from requests import Request
-from download_boss.RequestEnvelope import RequestEnvelope
-from download_boss.HttpClient import HttpClient
+from download_boss.client.request.RequestEnvelope import RequestEnvelope
+from download_boss.client.HttpClient import HttpClient
 from download_boss.error.ClientRetriable import ClientRetriable
 
 request = RequestEnvelope(
@@ -59,8 +59,8 @@ Kerberos authentication:
 ```python
 from requests import Request
 from requests_kerberos import HTTPKerberosAuth, OPTIONAL
-from download_boss.RequestEnvelope import RequestEnvelope
-from download_boss.HttpClient import HttpClient
+from download_boss.client.request.RequestEnvelope import RequestEnvelope
+from download_boss.client.HttpClient import HttpClient
 
 request = RequestEnvelope(
     Request(method='POST', url='https://httpbin.org/anything/kerb', auth=HTTPKerberosAuth(mutual_authentication=OPTIONAL))
@@ -73,9 +73,9 @@ response = HttpClient().download(request)
 Retry automatically some HTTP status codes
 ```python
 from requests import Request
-from download_boss.RequestEnvelope import RequestEnvelope
-from download_boss.HttpClient import HttpClient
-from download_boss.RetryWrapper import RetryWrapper
+from download_boss.client.request.RequestEnvelope import RequestEnvelope
+from download_boss.client.HttpClient import HttpClient
+from download_boss.wrapper.RetryWrapper import RetryWrapper
 from download_boss.error.RetriesExhausted import RetriesExhausted
 
 request = RequestEnvelope(
@@ -103,10 +103,10 @@ Delay download calls by 2-5 seconds
 
 ```python
 from requests import Request
-from download_boss.RequestEnvelope import RequestEnvelope
-from download_boss.HttpClient import HttpClient
-from download_boss.RetryWrapper import RetryWrapper
-from download_boss.DelayWrapper import DelayWrapper
+from download_boss.client.request.RequestEnvelope import RequestEnvelope
+from download_boss.client.HttpClient import HttpClient
+from download_boss.wrapper.RetryWrapper import RetryWrapper
+from download_boss.wrapper.DelayWrapper import DelayWrapper
 from download_boss.error.RetriesExhausted import RetriesExhausted
 
 client = HttpClient(throwRetriableStatusCodeRanges=[401, range(500,599)])
@@ -137,11 +137,11 @@ for r in requests:
 ```python
 from os.path import join, dirname
 from requests import Request
-from download_boss.RequestEnvelope import RequestEnvelope
-from download_boss.HttpClient import HttpClient
-from download_boss.RetryWrapper import RetryWrapper
-from download_boss.DelayWrapper import DelayWrapper
-from download_boss.FileCacheWrapper import FileCacheWrapper
+from download_boss.client.request.RequestEnvelope import RequestEnvelope
+from download_boss.client.HttpClient import HttpClient
+from download_boss.wrapper.RetryWrapper import RetryWrapper
+from download_boss.wrapper.DelayWrapper import DelayWrapper
+from download_boss.wrapper.FileCacheWrapper import FileCacheWrapper
 
 cacheFolderPath = join(dirname(__file__), "cache")
 cacheLength = 60*60*24 # 1 day

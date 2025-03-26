@@ -3,7 +3,8 @@ import re
 import hashlib
 import json
 
-from .AbstractRequestEnvelope import AbstractRequestEnvelope
+from download_boss.client.request.AbstractRequestEnvelope import AbstractRequestEnvelope
+
 
 class HttpRequestEnvelope(AbstractRequestEnvelope):
 

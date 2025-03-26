@@ -1,9 +1,10 @@
 import time
 import logging
 
-from .AbstractWrapper import AbstractWrapper
-from .error.RetriesExhausted import RetriesExhausted
-from .error.ClientRetriable import ClientRetriable
+from download_boss.wrapper.AbstractWrapper import AbstractWrapper
+from download_boss.error.RetriesExhausted import RetriesExhausted
+from download_boss.error.ClientRetriable import ClientRetriable
+
 
 class RetryWrapper(AbstractWrapper):
 

@@ -2,11 +2,13 @@ import unittest
 import requests
 import time
 
-from download_boss.HttpRequestEnvelope import HttpRequestEnvelope
-from download_boss.HttpClient import HttpClient
-from download_boss.DelayWrapper import DelayWrapper
+from download_boss.client.request.HttpRequestEnvelope import HttpRequestEnvelope
+from download_boss.client.HttpClient import HttpClient
+from download_boss.wrapper.DelayWrapper import DelayWrapper
+
 
 requests.packages.urllib3.disable_warnings()
+
 
 class TestDelayWrapper(unittest.TestCase):
 

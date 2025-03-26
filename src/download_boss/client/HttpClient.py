@@ -1,8 +1,9 @@
 import requests
 import logging
 
-from .AbstractClient import AbstractClient
-from .error.ClientRetriable import ClientRetriable
+from download_boss.client.AbstractClient import AbstractClient
+from download_boss.error.ClientRetriable import ClientRetriable
+
 
 class HttpClient(AbstractClient):
 

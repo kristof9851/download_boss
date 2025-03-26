@@ -7,7 +7,8 @@ from types import SimpleNamespace
 
 from download_boss.error.RetriesExhausted import RetriesExhausted
 from download_boss.error.ClientRetriable import ClientRetriable
-from download_boss.HttpRequestEnvelope import HttpRequestEnvelope
+from download_boss.client.request.HttpRequestEnvelope import HttpRequestEnvelope
+
 
 class OpenSearchAPI:
     

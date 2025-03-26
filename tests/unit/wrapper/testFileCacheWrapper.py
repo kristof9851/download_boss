@@ -1,11 +1,13 @@
 import unittest
 import requests
 
-from download_boss.HttpRequestEnvelope import HttpRequestEnvelope
-from download_boss.HttpClient import HttpClient
-from download_boss.FileCacheWrapper import FileCacheWrapper
+from download_boss.client.request.HttpRequestEnvelope import HttpRequestEnvelope
+from download_boss.client.HttpClient import HttpClient
+from download_boss.wrapper.FileCacheWrapper import FileCacheWrapper
+
 
 requests.packages.urllib3.disable_warnings()
+
 
 class TestFileCacheWrapper(unittest.TestCase):
 

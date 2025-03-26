@@ -3,7 +3,8 @@ import requests
 from requests_kerberos import HTTPKerberosAuth, OPTIONAL
 from requests_aws4auth import AWS4Auth
 
-from .AwsAuthGenerator import AwsAuthGenerator
+from download_boss.auth_generator.AwsAuthGenerator import AwsAuthGenerator
+
 
 class RequestsAwsAuthGenerator(AwsAuthGenerator):
 

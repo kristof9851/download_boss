@@ -3,8 +3,9 @@ from botocore.exceptions import ClientError
 import logging
 import time
 
-from .AbstractClient import AbstractClient
-from .error.ClientRetriable import ClientRetriable
+from download_boss.client.AbstractClient import AbstractClient
+from download_boss.error.ClientRetriable import ClientRetriable
+
 
 class StatusResponse:
     def __init__(self, message, status_code):

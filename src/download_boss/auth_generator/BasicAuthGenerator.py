@@ -1,7 +1,8 @@
 import logging
 from requests.auth import HTTPBasicAuth
 
-from .AbstractAuthGenerator import AbstractAuthGenerator
+from download_boss.auth_generator.AbstractAuthGenerator import AbstractAuthGenerator
+
 
 class BasicAuthGenerator(AbstractAuthGenerator):
 

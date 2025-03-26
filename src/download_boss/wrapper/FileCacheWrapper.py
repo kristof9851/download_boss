@@ -7,10 +7,11 @@ import logging
 import traceback
 import json
 
-from .AbstractWrapper import AbstractWrapper
-from .error.CachedFileNotFound import CachedFileNotFound
-from .error.CachedFileExpired import CachedFileExpired
-from .Boto3LogsRequestEnvelope import Boto3LogsRequestEnvelope
+from download_boss.wrapper.AbstractWrapper import AbstractWrapper
+from download_boss.error.CachedFileNotFound import CachedFileNotFound
+from download_boss.error.CachedFileExpired import CachedFileExpired
+from download_boss.client.request.Boto3LogsRequestEnvelope import Boto3LogsRequestEnvelope
+
 
 class FileCacheWrapper(AbstractWrapper):
 

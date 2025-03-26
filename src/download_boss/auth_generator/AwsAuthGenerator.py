@@ -3,11 +3,12 @@ import requests
 from requests_kerberos import HTTPKerberosAuth, OPTIONAL
 from requests_aws4auth import AWS4Auth
 
-from ..HttpClient import HttpClient
-from ..RetryWrapper import RetryWrapper
-from ..HttpRequestEnvelope import HttpRequestEnvelope
-from ..error.AuthFailed import AuthFailed
-from .AbstractAuthGenerator import AbstractAuthGenerator
+from download_boss.client.HttpClient import HttpClient
+from download_boss.wrapper.RetryWrapper import RetryWrapper
+from download_boss.client.request.HttpRequestEnvelope import HttpRequestEnvelope
+from download_boss.error.AuthFailed import AuthFailed
+from download_boss.auth_generator.AbstractAuthGenerator import AbstractAuthGenerator
+
 
 class AwsAuthGenerator(AbstractAuthGenerator):
 

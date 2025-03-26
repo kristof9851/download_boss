@@ -2,7 +2,8 @@ import time
 import random
 import logging
 
-from .AbstractWrapper import AbstractWrapper
+from download_boss.wrapper.AbstractWrapper import AbstractWrapper
+
 
 class DelayWrapper(AbstractWrapper):
 

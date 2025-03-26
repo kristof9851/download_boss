@@ -3,11 +3,13 @@ import requests
 from requests import HTTPError
 from requests.exceptions import SSLError
 
-from download_boss.HttpClient import HttpClient
-from download_boss.HttpRequestEnvelope import HttpRequestEnvelope
+from download_boss.client.HttpClient import HttpClient
+from download_boss.client.request.HttpRequestEnvelope import HttpRequestEnvelope
 from download_boss.error.ClientRetriable import ClientRetriable
 
+
 requests.packages.urllib3.disable_warnings()
+
 
 class TestHttpClient(unittest.TestCase):
 

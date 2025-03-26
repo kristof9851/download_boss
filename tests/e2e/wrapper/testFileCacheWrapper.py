@@ -3,12 +3,14 @@ import requests
 import time
 import os
 
-from download_boss.HttpRequestEnvelope import HttpRequestEnvelope
-from download_boss.HttpClient import HttpClient
-from download_boss.FileCacheWrapper import FileCacheWrapper
-from .util.TestUtil import getCacheDirPath
+from download_boss.client.request.HttpRequestEnvelope import HttpRequestEnvelope
+from download_boss.client.HttpClient import HttpClient
+from download_boss.wrapper.FileCacheWrapper import FileCacheWrapper
+from ..util.TestUtil import getCacheDirPath
+
 
 requests.packages.urllib3.disable_warnings()
+
 
 class TestFileCacheWrapper(unittest.TestCase):
 

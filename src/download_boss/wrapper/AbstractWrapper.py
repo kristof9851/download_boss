@@ -1,4 +1,5 @@
-from .AbstractClient import AbstractClient
+from download_boss.client.AbstractClient import AbstractClient
+
 
 class AbstractWrapper(AbstractClient):
 
